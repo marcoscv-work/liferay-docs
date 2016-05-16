@@ -189,6 +189,30 @@ This causes Pandoc to create the following, easily styled markup:
 	
 We've duplicated this behavior in the Pegdown parser that we've implemented. 
 
+### Inline Images / Icon Images
+
+An icon's image helps the reader identify the icon in the UI. To use an existing
+icon snapshot, check a document's `images/` folder for files ending in *-icon.png*.
+Follow these steps
+to include an icon image inline in your article's Markdown text:
+
+1. Take a snapshot of the icon, if one doesn't already exist in the document's
+`images/` folder. Please save the snapshot to the `images/` folder and end its name with
+`-icon.png`. 
+2. Crop the image to remove unrelated content from around the icon.
+3. Resize the image's height to no greater than 20 pixels. **Important:** Make sure to keep the
+aspect ratio. 
+4. In the Markdown text, include the icon image in parentheses.
+
+Inline icon image example Markdown:
+
+    Click the *Add Blog Entry* icon (![Add Blog Entry](../../images/add-icon.png))
+    to bring up the blog entry editor.
+
+Result shown in a Knowledge Base article:
+
+![Inline icon image](images/render-icon-image-inline.png)
+
 ### Right Arrows 
 
 We are in the habit of using right arrows to denote a series of things a user
@@ -280,73 +304,31 @@ Next, let's learn about creating sidebar text.
 
 ### Sidebars
 
-Our documentation frequently has sidebars, which are for ancillary information
-that doesn't quite fit into the text itself. To do sidebars, set off your
-sidebar with two horizontal rules, like so: 
+Sidebars appear frequently in our documentation. We place text in sidebars if we
+want to draw special attention to it or if the text contains ancillary
+information that doesn't quite belong in the main text. For example, notes,
+tips, and warnings are often placed in sidebars. To create a sidebar, set off
+your sidebar text with a begin sidebar token (`+$$$`) and an end sidebar token
+(`$$$`), like so: 
 
+    +$$$
 
-	---
+    Your sidebar text goes here. 
 
-	![tip](../../images/01-tip.png) Your sidebar text goes here. 
+    $$$
 
-	---
+Sidebars are only rendered on [dev.liferay.com](https://dev.liferay.com). They
+are not rendered on Github.
 
-Here is a sidebar rendered in Github ...
+Here's what a sidebar on [dev.liferay.com](https://dev.liferay.com) looks like:
 
----
+![liferay-sidebar image](./images/ldn-sidebar.png)
 
-![tip](./images/tip.png) Your sidebar text goes here.
+There's no need to include images in your sidebars. Images for sidebars are
+handled by Liferay's [dev.liferay.com](https://dev.liferay.com) theme.
 
----
-
-Leave a space between the closing parenthesis and your sidebar text. That way,
-formatting (e.g., bold, italics, etc.) will be rendered properly by Github for
-the leading text. Otherwise, you'll see the markdown characters. The following
-example markdown properly precedes its sidebar text with a space.
-
-    ---
-
-    ![tip](./images/tip.png) **Tip:** Your sidebar text goes here.
-
-    ---
-
-Without the space between the closing `)` and `**Tip:**`, its souce does not get
-converted by Github.
-
-    ---
-
-    ![tip](./images/tip.png)**Tip:** Preceding sidebar text with a space makes
-    for better formatting, than what is done in this example.
-
-    ---
-
----
-
-![tip](./images/tip.png)**Tip:** Preceding sidebar text with a space makes
-for better formatting, than what is done in this example.
-
----
-
-**Important:** Make sure that your horizontal rules have empty lines above and
-below them so that they do not trigger new headers to be created during
-conversion to HTML. 
-
-If you're using jEdit, you can make this easy with the SuperAbbrevs plugin.
-Create an abbreviation by going to *Plugins* -> *Plugin Options* ->
-*SuperAbbrevs*. Click the *+* button to add an abbreviation. Create an
-abbreviation called **sidebar** for the Markdown mode, and put the following in
-the template text: 
-
-
-	---
-
-	![tip](../../images/01-tip.png)$1
-
-	---
-
-Click *OK*, and *OK* again to come out of the Plugin Options dialog. Now,
-whenever you need to do a sidebar, you can simply type the word *sidebar* and
-hit your tab key, and the markup will be entered for you. 
+**Important:** Make sure that your sidebar tokens have empty lines above and
+below them so that they are parsed as independent paragraphs.
 
 Let's look at ordered lists, next.
 
@@ -377,11 +359,14 @@ is disrupted and the step that follows restarts at `1`.
 
     3. Third step.
 
-        ---
+        +$$$
 
-        ![note](./images/tip.png) A sidebar note.
+        **Note:** A sidebar note. Text is placed in sidebars if it deserves
+        special attention or if it contains ancillary information that doesn't
+        quite belong in the main text. For example, notes, tips, and warnings
+        are often placed in sidebars. 
 
-        ---
+        $$$
 
     4. Finally! The fourth and final step. Code must be indented 4 spaces more.
     Let's see a good code block ...
@@ -402,11 +387,7 @@ is disrupted and the step that follows restarts at `1`.
 
 3. Third step.
 
-    ---
-
-    ![note](./images/tip.png) A sidebar note.
-
-    ---
+    ![liferay-sidebar image](./images/ldn-sidebar.png)
 
 4. Finally! The fourth and final step. Code must be indented 4 spaces more.
 Let's see a good code block ...
@@ -432,11 +413,10 @@ example--the *Bad steps*.
 
     3. Third step.
 
-    ---
-
-    ![note](./images/tip.png) This note disrupts continuous numbering.
-
-    ---
+    +$$$
+    **Note:** This note disrupts continuous numbering. It also won't be rendered
+    as a sidebar.
+    $$$
 
     4. Finally! The fourth and final step. But the code is not monospace as it
     needs to be indented 4 more spaces ...
@@ -457,12 +437,11 @@ This paragraph is not indented 4 spaces from the step number.
 
 3. Third step. 
 
----
-
-![note](./images/tip.png) This sidebar note disrupts continuous numbering
-because it is not indented 4 spaces.
-
----
++$$$
+**Note:** This sidebar note disrupts continuous numbering because it is not
+indented four spaces. It also is not rendered as a sidebar because there are no
+blank lines below the begin sidebar token or above the end sidebar token.
+$$$
 
 4. Finally! The fourth and final step. But the code is not monospace as it
 needs to be indented 4 more spaces ...

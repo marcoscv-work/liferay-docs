@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -39,7 +41,17 @@ public class DistDiffTask extends Task {
 			e.printStackTrace();
 		}
 
-		String txtPath = _purposedir + "/" + _docdir + "/";	
+		String txtPath;
+		
+		if (System.getProperty("user.dir").contains(_purposedir + "\\learning-paths") ||
+				System.getProperty("user.dir").contains(_purposedir + "/learning-paths")) {
+			txtPath = _purposedir + "/learning-paths/" + _docdir + "/";
+		}
+
+		else {
+			txtPath = _purposedir + "/" + _docdir + "/";
+		}
+
 		Set<String> files = new HashSet<String>();
 		Iterator<String> it = diffs.iterator();
 
@@ -133,6 +145,9 @@ public class DistDiffTask extends Task {
 			File markdownFile = new File(file);
 			markdownFiles.add(markdownFile);				
 		}
+		
+		// Find and add all modified/new MD files' intro file
+		findIntroFiles(markdownFiles, markdownArticlesFinal);
 
 		// Scan each MD file for remainder of images to include in ZIP file. When
 		// re-importing a new MD file, all of its images must also be re-imported.
@@ -206,11 +221,39 @@ public class DistDiffTask extends Task {
 		zipOutputStream.closeEntry();
 		fileInputStream.close();
 	}
+	
+	private static void findIntroFiles(Set<File> markdownFiles, Set<String> markdownArticlesFinal) {
+		
+		Set<File> introFiles = new HashSet<File>();
+
+		for (File file : markdownFiles) {
+			if (!file.toString().contains("intro.markdown") ||
+					!file.toString().contains("introduction.markdown")) {
+
+				File parentDir = file.getParentFile();
+				File[] dirIntroFiles = parentDir.listFiles(new FilenameFilter() {
+					public boolean accept(File dir, String name) {
+						return name.equals("intro.markdown") ||
+								name.equals("introduction.markdown");
+					}
+				});
+
+				for (File introFile : dirIntroFiles) {
+					introFiles.add(introFile);
+				}
+			}
+		}
+
+		for (File intro : introFiles) {
+			markdownArticlesFinal.add(intro.toString().replace("\\", "/"));
+		}
+	}
 
 	private static void findMarkdownFiles(File dir, Set<File> chFiles) {
 
 		File articleDir = new File(dir.getAbsolutePath() + "/articles");
-		File[] articles = articleDir.listFiles();
+		File articleDxpDir = new File(dir.getAbsolutePath() + "/articles-dxp");
+		File[] articles = (File[])ArrayUtils.addAll(articleDir.listFiles(), articleDxpDir.listFiles());
 
 		for (File article : articles) {
 
